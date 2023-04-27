@@ -25,6 +25,8 @@ def launch(args):
     for args.task, args.model in it.product(args.tasks, args.models):
 
         model_dir_name = '_'.join(filter(None, [args.model, *args.model_version]))
+        init_model_dir_name = '_'.join(filter(None, [args.model, *args.model_init_version])) \
+            if len(args.model_init_version) > 0 else None
         task_name = '_'.join(filter(None, [args.task, *args.task_version]))
 
         # data dirs - list of directories combined in generator
@@ -37,7 +39,11 @@ def launch(args):
 
         # setup save dir
         save_dir = os.path.join(BASE_MODEL_PATH, output_dir, task_name, model_dir_name)
-        make_dir(save_dir)
+        # make_dir(save_dir)
+
+        # specify init model dir
+        init_dir = os.path.join(BASE_MODEL_PATH, output_dir, task_name, init_model_dir_name) \
+            if init_model_dir_name else None
 
         # setup parameters
         learning_params, model_params, label_params, image_params = setup_training(
@@ -81,6 +87,7 @@ def launch(args):
             val_generator=val_generator,
             learning_params=learning_params,
             save_dir=save_dir,
+            init_dir=init_dir,
             device=args.device
         )
 
@@ -98,14 +105,15 @@ def launch(args):
 if __name__ == "__main__":
 
     args = parse_args(
-        robot='franka',
-        sensor='tactip_1',
+        robot='cr',
+        sensor='tactip',
         tasks=['surface_3d'],
-        task_version=['shear'],
-        train_dirs=['train'],
-        val_dirs=['val'],
+        task_version=[''],
+        train_dirs=['train_data'],
+        val_dirs=['val_data'],
         models=['simple_cnn_mdn'],
-        model_version=['temp'],
+        model_version=['2604_1654'],
+        model_init_version=['2604_1847'],
         device='cuda'
     )
 
