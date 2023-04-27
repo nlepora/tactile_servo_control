@@ -14,21 +14,48 @@ def csv_row_to_label(row):
 
 def setup_learning(model_type, save_dir=None):
 
-    learning_params = {
-        'seed': 42,
-        'batch_size': 16,
-        'epochs': 10,
-        'lr': 1e-5,
-        'lr_factor': 0.5,
-        'lr_patience': 10,
-        'adam_decay': 1e-6,
-        'adam_b1': 0.9,
-        'adam_b2': 0.999,
-        'shuffle': True,
-        'n_cpu': 1,
-        'n_train_batches_per_epoch': None,
-        'n_val_batches_per_epoch': None,
-    }
+    if model_type == 'cnn_mdn_jl':
+        learning_params = {
+            'seed': 42,
+            'batch_size': 16,
+            'epochs': 10,
+            'cyclic_base_lr': 1e-8,
+            'cyclic_max_lr': 1e-4,
+            'cyclic_half_period': 5,
+            'shuffle': True,
+            'n_cpu': 1,
+            'n_train_batches_per_epoch': None,
+            'n_val_batches_per_epoch': None,
+        }
+    elif model_type == 'cnn_mdn_jl_pretrain':
+        learning_params = {
+            'seed': 42,
+            'batch_size': 16,
+            'epochs': 10,
+            'cyclic_base_lr': 1e-7,
+            'cyclic_max_lr': 1e-3,
+            'cyclic_half_period': 5,
+            'shuffle': True,
+            'n_cpu': 1,
+            'n_train_batches_per_epoch': None,
+            'n_val_batches_per_epoch': None,
+        }
+    else:
+        learning_params = {
+            'seed': 42,
+            'batch_size': 16,
+            'epochs': 10,
+            'lr': 1e-5,
+            'lr_factor': 0.5,
+            'lr_patience': 10,
+            'adam_decay': 1e-6,
+            'adam_b1': 0.9,
+            'adam_b2': 0.999,
+            'shuffle': True,
+            'n_cpu': 1,
+            'n_train_batches_per_epoch': None,
+            'n_val_batches_per_epoch': None,
+        }
 
     if save_dir:
         save_json_obj(learning_params, os.path.join(save_dir, 'learning_params'))
@@ -114,7 +141,6 @@ def setup_model(model_type, save_dir=None):
             }
         }
 
-
     elif model_params['model_type'] == 'resnet':
         model_params = {
             'model_kwargs': {
@@ -132,6 +158,48 @@ def setup_model(model_type, save_dir=None):
                 'mlp_dim': 512,
                 'pool': 'mean',  # for regression
             }
+        }
+
+    elif model_params['model_type'] == 'cnn_mdn_jl':
+        model_params['model_kwargs'] = {
+            'conv_filters': [16, 32, 64, 128],
+            'conv_kernel_sizes': [11, 9, 7, 5],
+            'conv_padding': 'same',
+            'conv_batch_norm': True,
+            'conv_activation': 'elu',
+            'conv_pool_size': 2,
+            'fc_units': [512, 512],
+            'fc_activation': 'elu',
+            'fc_dropout': 0.1,
+            'mdn_components': 1,
+            'pi_dropout': 0.1,
+            'mu_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
+            'sigma_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
+            'mu_min': [-np.inf] * 6,
+            'mu_max': [np.inf] * 6,
+            'sigma_inv_min': [1e-6] * 6,
+            'sigma_inv_max': [1e6] * 6,
+        }
+
+    elif model_params['model_type'] == 'cnn_mdn_pretrain_jl':
+        model_params['model_kwargs'] = {
+            'conv_filters': [16, 32, 64, 128],
+            'conv_kernel_sizes': [11, 9, 7, 5],
+            'conv_padding': 'same',
+            'conv_batch_norm': True,
+            'conv_activation': 'elu',
+            'conv_pool_size': 2,
+            'fc_units': [512, 512],
+            'fc_activation': 'elu',
+            'fc_dropout': 0.1,
+            'mdn_components': 1,
+            'pi_dropout': 0.1,
+            'mu_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
+            'sigma_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
+            'mu_min': [-np.inf] * 6,
+            'mu_max': [np.inf] * 6,
+            'sigma_inv_min': [0.1, 0.1, 0.25, 6/5, 6/5, 6],
+            'sigma_inv_max': [0.1, 0.1, 0.25, 6/5, 6/5, 6],
         }
 
     else:

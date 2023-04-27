@@ -111,7 +111,9 @@ if __name__ == "__main__":
         task_version=[''],
         train_dirs=['train_data'],
         val_dirs=['val_data'],
-        models=['simple_cnn_mdn'],
+        # models=['simple_cnn_mdn'],
+        models=['cnn_mdn_jl'],
+        # models=['cnn_mdn_pretrain_jl'],
         model_version=['2604_1654'],
         model_init_version=['2604_1847'],
         device='cuda'
