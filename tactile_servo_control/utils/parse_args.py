@@ -12,7 +12,8 @@ def parse_args(
         val_dirs=['val'],
         models=['simple_cnn'],
         model_version=[],
-        model_init_version=[],
+        init_model=[],
+        init_model_version=[],
         objects=['circle'],
         run_version=[],
         device='cuda'
@@ -74,10 +75,16 @@ def parse_args(
         default=model_version
     )
     parser.add_argument(
-        '-iv', '--model_init_version',
+        '-im', '--init_model',
+        nargs='+',
+        help="Choose model from ['simple_cnn', 'posenet_cnn', 'nature_cnn', 'resnet', 'vit']",
+        default=init_model
+    )
+    parser.add_argument(
+        '-iv', '--init_model_version',
         type=str,
-        help="Choose initial version.",
-        default=model_init_version
+        help="Choose initial model version.",
+        default=init_model_version
     )
     parser.add_argument(
         '-o', '--objects',

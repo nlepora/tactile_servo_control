@@ -50,7 +50,7 @@ def evaluate_model(
 
         # forward pass
         try:
-            pred_means, pred_stdev = model.sample(inputs)
+            pred_means, pred_stdev = model.predict(inputs)
         except: # compatibility without MDN
             pred_means = model(inputs)
             pred_stdev = pred_means*0

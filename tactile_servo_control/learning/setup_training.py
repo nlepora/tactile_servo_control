@@ -13,15 +13,15 @@ def csv_row_to_label(row):
 
 
 def setup_learning(model_type, save_dir=None):
-
     if model_type == 'cnn_mdn_jl':
         learning_params = {
             'seed': 42,
             'batch_size': 16,
-            'epochs': 10,
+            'epochs': 50,
             'cyclic_base_lr': 1e-8,
             'cyclic_max_lr': 1e-4,
             'cyclic_half_period': 5,
+            'cyclic_mode': 'triangular',
             'shuffle': True,
             'n_cpu': 1,
             'n_train_batches_per_epoch': None,
@@ -31,10 +31,11 @@ def setup_learning(model_type, save_dir=None):
         learning_params = {
             'seed': 42,
             'batch_size': 16,
-            'epochs': 10,
+            'epochs': 50,
             'cyclic_base_lr': 1e-7,
             'cyclic_max_lr': 1e-3,
             'cyclic_half_period': 5,
+            'cyclic_mode': 'triangular',
             'shuffle': True,
             'n_cpu': 1,
             'n_train_batches_per_epoch': None,
@@ -64,7 +65,6 @@ def setup_learning(model_type, save_dir=None):
 
 
 def setup_model_image(save_dir=None):
-
     image_processing_params = {
         'dims': (128, 128),
         'bbox': None,
@@ -92,7 +92,6 @@ def setup_model_image(save_dir=None):
 
 
 def setup_model(model_type, save_dir=None):
-
     if model_type[-4:] == '_mdn':
         model_params = {
             'model_type': model_type[:-4],
@@ -171,17 +170,17 @@ def setup_model(model_type, save_dir=None):
             'fc_units': [512, 512],
             'fc_activation': 'elu',
             'fc_dropout': 0.1,
-            'mdn_components': 1,
+            'mix_components': 1,
             'pi_dropout': 0.1,
             'mu_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
-            'sigma_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
+            'sigma_inv_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
             'mu_min': [-np.inf] * 6,
             'mu_max': [np.inf] * 6,
             'sigma_inv_min': [1e-6] * 6,
             'sigma_inv_max': [1e6] * 6,
         }
 
-    elif model_params['model_type'] == 'cnn_mdn_pretrain_jl':
+    elif model_params['model_type'] == 'cnn_mdn_jl_pretrain':
         model_params['model_kwargs'] = {
             'conv_filters': [16, 32, 64, 128],
             'conv_kernel_sizes': [11, 9, 7, 5],
@@ -192,14 +191,14 @@ def setup_model(model_type, save_dir=None):
             'fc_units': [512, 512],
             'fc_activation': 'elu',
             'fc_dropout': 0.1,
-            'mdn_components': 1,
+            'mix_components': 1,
             'pi_dropout': 0.1,
             'mu_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
-            'sigma_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
+            'sigma_inv_dropout': [0.1, 0.1, 0.2, 0.0, 0.0, 0.1],
             'mu_min': [-np.inf] * 6,
             'mu_max': [np.inf] * 6,
-            'sigma_inv_min': [0.1, 0.1, 0.25, 6/5, 6/5, 6],
-            'sigma_inv_max': [0.1, 0.1, 0.25, 6/5, 6/5, 6],
+            'sigma_inv_min': [1] * 6,
+            'sigma_inv_max': [1] * 6,
         }
 
     else:
@@ -223,9 +222,11 @@ def setup_model_labels(task_name, data_dirs, save_dir=None):
     }
 
     target_weights_dict = {
-        'surface_3d':      [1, 1, 1, 2, 2, 4],
+        # 'surface_3d': [1, 1, 1, 2, 2, 4],
+        'surface_3d': [1, 1, 1, 1, 1, 1],
         'surface_3d_pose': [1, 1, 1],
-        'surface_3d_shear': [1, 1, 2],
+        # 'surface_3d_shear': [1, 1, 2],
+        'surface_3d_shear': [1, 1, 1],
     }
 
     # get data limits from training data

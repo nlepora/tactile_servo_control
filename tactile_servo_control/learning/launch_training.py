@@ -25,8 +25,8 @@ def launch(args):
     for args.task, args.model in it.product(args.tasks, args.models):
 
         model_dir_name = '_'.join(filter(None, [args.model, *args.model_version]))
-        init_model_dir_name = '_'.join(filter(None, [args.model, *args.model_init_version])) \
-            if len(args.model_init_version) > 0 else None
+        init_model_dir_name = '_'.join(filter(None, [*args.init_model, *args.init_model_version])) \
+            if args.init_model and args.init_model_version else None
         task_name = '_'.join(filter(None, [args.task, *args.task_version]))
 
         # data dirs - list of directories combined in generator
@@ -104,6 +104,7 @@ def launch(args):
 
 if __name__ == "__main__":
 
+    # stage 1 - pre-training
     args = parse_args(
         robot='cr',
         sensor='tactip',
@@ -111,12 +112,24 @@ if __name__ == "__main__":
         task_version=[''],
         train_dirs=['train_data'],
         val_dirs=['val_data'],
-        # models=['simple_cnn_mdn'],
-        models=['cnn_mdn_jl'],
-        # models=['cnn_mdn_pretrain_jl'],
-        model_version=['2604_1654'],
-        model_init_version=['2604_1847'],
+        models=['cnn_mdn_jl_pretrain'],
+        model_version=['2704_1526'],
         device='cuda'
     )
+
+    # stage 2 - fine-tuning
+    # args = parse_args(
+    #     robot='cr',
+    #     sensor='tactip',
+    #     tasks=['surface_3d'],
+    #     task_version=[''],
+    #     train_dirs=['train_data'],
+    #     val_dirs=['val_data'],
+    #     models=['cnn_mdn_jl'],
+    #     model_version=['2704_1621'],
+    #     init_model=['cnn_mdn_jl_pretrain'],
+    #     init_model_version=['2704_1526'],
+    #     device='cuda'
+    # )
 
     launch(args)
