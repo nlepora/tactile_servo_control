@@ -39,7 +39,7 @@ def launch(args):
 
         # setup save dir
         save_dir = os.path.join(BASE_MODEL_PATH, output_dir, task_name, model_dir_name)
-        # make_dir(save_dir)
+        make_dir(save_dir)
 
         # specify init model dir
         init_dir = os.path.join(BASE_MODEL_PATH, output_dir, task_name, init_model_dir_name) \

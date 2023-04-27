@@ -12,7 +12,7 @@ def csv_row_to_label(row):
     return row_dict
 
 
-def setup_learning(save_dir=None):
+def setup_learning(model_type, save_dir=None):
 
     learning_params = {
         'seed': 42,
@@ -183,7 +183,7 @@ def setup_model_labels(task_name, data_dirs, save_dir=None):
 
 
 def setup_training(model_type, task, data_dirs, save_dir=None):
-    learning_params = setup_learning(save_dir)
+    learning_params = setup_learning(model_type, save_dir)
     model_params = setup_model(model_type, save_dir)
     model_label_params = setup_model_labels(task, data_dirs, save_dir)
     model_image_params = setup_model_image(save_dir)
