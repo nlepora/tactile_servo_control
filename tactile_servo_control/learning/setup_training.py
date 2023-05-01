@@ -181,7 +181,7 @@ def setup_model_labels(task_name, data_dirs, save_dir=None):
     }
 
     target_weights_dict = {
-        'surface_3d':      [1, 1, 1, 2, 2, 4],
+        'surface_3d':      [1, 1, 1, 1, 1, 1],
         'surface_3d_pose': [1, 1, 1],
         'surface_3d_shear': [1, 1, 2],
     }
