@@ -14,20 +14,34 @@ def csv_row_to_label(row):
 
 def setup_learning(save_dir=None):
 
+    # learning_params = {
+    #     'seed': 42,
+    #     'batch_size': 16,
+    #     'epochs': 10,
+    #     'lr': 1e-5,
+    #     'lr_factor': 0.5,
+    #     'lr_patience': 10,
+    #     'adam_decay': 1e-6,
+    #     'adam_b1': 0.9,
+    #     'adam_b2': 0.999,
+    #     'shuffle': True,
+    #     'n_cpu': 1,
+    #     'n_train_batches_per_epoch': None,
+    #     'n_val_batches_per_epoch': None,
+    # }
+
     learning_params = {
-        'seed': 42,
-        'batch_size': 16,
-        'epochs': 10,
-        'lr': 1e-5,
-        'lr_factor': 0.5,
-        'lr_patience': 10,
-        'adam_decay': 1e-6,
-        'adam_b1': 0.9,
-        'adam_b2': 0.999,
-        'shuffle': True,
-        'n_cpu': 1,
-        'n_train_batches_per_epoch': None,
-        'n_val_batches_per_epoch': None,
+        "seed": 42, 
+        "batch_size": 16, 
+        "epochs": 50, 
+        "cyclic_base_lr": 1e-08, 
+        "cyclic_max_lr": 0.0001, 
+        "cyclic_half_period": 5, 
+        "cyclic_mode": "triangular", 
+        "shuffle": True, 
+        "n_cpu": 1, 
+        "n_train_batches_per_epoch": None, 
+        "n_val_batches_per_epoch": None
     }
 
     if save_dir:
@@ -95,43 +109,55 @@ def setup_model(model_type, save_dir=None):
         }
 
     elif model_params['model_type'] == 'posenet_cnn':
-        model_params = {
-            'model_kwargs': {
-                'conv_layers': [256, 256, 256, 256, 256],
-                'conv_kernel_sizes': [3, 3, 3, 3, 3],
-                'fc_layers': [64],
-                'activation': 'elu',
-                'dropout': 0.0,
-                'apply_batchnorm': True,
-            }
+        model_params['model_kwargs'] = {
+            'conv_layers': [256, 256, 256, 256, 256],
+            'conv_kernel_sizes': [3, 3, 3, 3, 3],
+            'fc_layers': [64],
+            'activation': 'elu',
+            'dropout': 0.0,
+            'apply_batchnorm': True,
         }
 
     elif model_params['model_type'] == 'nature_cnn':
-        model_params = {
-            'model_kwargs': {
-                'fc_layers': [512, 512],
-                'dropout': 0.0,
-            }
+        model_params['model_kwargs'] = {
+            'fc_layers': [512, 512],
+            'dropout': 0.0,
         }
 
-
     elif model_params['model_type'] == 'resnet':
-        model_params = {
-            'model_kwargs': {
-                'layers': [2, 2, 2, 2]
-            }
+        model_params['model_kwargs'] = {
+            'layers': [2, 2, 2, 2]
         }
 
     elif model_params['model_type'] == 'vit':
-        model_params = {
-            'model_kwargs': {
-                'patch_size': 32,
-                'dim': 128,
-                'depth': 6,
-                'heads': 8,
-                'mlp_dim': 512,
-                'pool': 'mean',  # for regression
-            }
+        model_params['model_kwargs'] = {
+            'patch_size': 32,
+            'dim': 128,
+            'depth': 6,
+            'heads': 8,
+            'mlp_dim': 512,
+            'pool': 'mean',  # for regression
+        }
+
+    elif model_params['model_type'] == 'cnn_mdn_jl':
+        model_params['model_kwargs'] = {
+            "conv_filters": [16, 32, 64, 128], 
+            "conv_kernel_sizes": [11, 9, 7, 5], 
+            "conv_padding": "same", 
+            "conv_batch_norm": True, 
+            "conv_activation": "elu", 
+            "conv_pool_size": 2, 
+            "fc_units": [512, 512], 
+            "fc_activation": "elu", 
+            "fc_dropout": 0.1, 
+            "mix_components": 1, 
+            "pi_dropout": 0.1, 
+            "mu_dropout": [0.1, 0.1, 0.2, 0.0, 0.0, 0.1], 
+            "sigma_inv_dropout": [0.1, 0.1, 0.2, 0.0, 0.0, 0.1], 
+            "mu_min": [-np.inf,]*6, 
+            "mu_max": [np.inf,]*6, 
+            "sigma_inv_min": [1e-06,]*6, 
+            "sigma_inv_max": [1e6,]*6
         }
 
     else:
